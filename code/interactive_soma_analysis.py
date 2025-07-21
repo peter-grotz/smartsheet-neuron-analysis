@@ -121,7 +121,7 @@ def run_soma_analysis(viz: SmartsheetVisualizer) -> None:
         plot_format = get_user_input("Plot format (svg/png/html)", default="svg", valid_options=["svg", "png", "html"])
     
     # Run the analysis
-    print(f"\n🔬 RUNNING ANALYSIS...")
+    print(f"\nRUNNING ANALYSIS...")
     print(f"   Soma Location: {soma_location}")
     print(f"   HIVE Filter: {'Yes' if hive_filter else 'No'}")
     print(f"   Save CSV: {'Yes' if save_csv else 'No'}")
@@ -139,8 +139,8 @@ def run_soma_analysis(viz: SmartsheetVisualizer) -> None:
         )
         
         if not summary_df.empty:
-                    print(f"\nAnalysis completed successfully!")
-        print(f"   Found data for {len(summary_df)} samples")
+            print(f"\nAnalysis completed successfully!")
+            print(f"   Found data for {len(summary_df)} samples")
             print(f"   Total neurons analyzed: {summary_df['Total_Neurons'].sum()}")
         else:
             print(f"\nNo data found matching your criteria.")
@@ -177,11 +177,11 @@ def main():
             if continue_choice.lower() not in ['yes', 'y']:
                 break
         
-                  print(f"\nThank you for using the Soma Location Analysis Tool!")
+        print(f"\nThank you for using the Soma Location Analysis Tool!")
         print(f"Check the 'outputs' directory for your saved results.")
     
     except KeyboardInterrupt:
-                  print(f"\n\nAnalysis interrupted by user. Goodbye!")
+        print(f"\n\nAnalysis interrupted by user. Goodbye!")
     except Exception as e:
         print(f"\nError: {e}")
         print("\nPlease ensure:")
