@@ -12,10 +12,43 @@ authors:
 # App Builder configuration
 app_panel:
   title: "Neuron Reconstruction Analysis"
-  description: "Enter parameters to analyze neuron reconstruction data from Smartsheet"
+  description: "Configure parameters for analyzing neuron reconstruction data from Smartsheet"
 
-# Default command - Code Ocean will run this
-command: "python run_analysis.py"
+# Call the bash run script which processes App Builder parameters
+command: "./code/run"
+
+# App Builder Parameters (passed as positional arguments to run script)
+parameters:
+  - name: "soma_location"
+    type: "string"
+    description: "Target soma location (e.g., LC, SI, PVT, VM, RT) or 'all' for all neurons"
+    default: "LC"
+    required: true
+    
+  - name: "hive_filter"
+    type: "boolean"
+    description: "Apply HIVE filter to show only HIVE-marked cells"
+    default: false
+    required: false
+    
+  - name: "plot_format"
+    type: "string"
+    description: "Output format for plots"
+    default: "png"
+    choices: ["svg", "png", "html"]
+    required: false
+    
+  - name: "save_csv"
+    type: "boolean"
+    description: "Save results as CSV file"
+    default: true
+    required: false
+    
+  - name: "create_plots"
+    type: "boolean"
+    description: "Generate visualization plots"
+    default: true
+    required: false
 
 # Environment variables required
 environment_variables:
