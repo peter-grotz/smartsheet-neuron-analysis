@@ -1,62 +1,62 @@
 #!/usr/bin/env bash
-set -ex
 
-# Code Ocean App Builder Run Script
-# Converts positional arguments to command line arguments for app_analysis.py
-
-# Arguments from App Builder (positional):
-# $1 = soma_location (required)
-# $2 = hive_filter (boolean: "true" or "false") 
-# $3 = plot_format (string: "svg", "png", "html")
-# $4 = save_csv (boolean: "true" or "false")
-# $5 = create_plots (boolean: "true" or "false")
+# Code Ocean entry point script for App Builder
+# App Builder passes parameters as: $1=soma_location, $2=hive_filter, $3=plot_format, $4=save_csv, $5=create_plots
 
 echo "Code Ocean - Smartsheet Neuron Reconstruction Analysis"
 echo "========================================================"
-echo "App Builder Mode - Processing parameters..."
 
-# Required parameter
-SOMA_LOCATION="$1"
-if [ -z "$SOMA_LOCATION" ]; then
-    echo "Error: soma_location parameter is required"
-    exit 1
-fi
-
-# Build command arguments
-CMD_ARGS="--soma-location $SOMA_LOCATION"
-
-# Optional: HIVE filter
-if [ "$2" = "true" ]; then
-    CMD_ARGS="$CMD_ARGS --hive-filter"
-fi
-
-# Optional: Plot format
-if [ -n "$3" ]; then
-    CMD_ARGS="$CMD_ARGS --plot-format $3"
-fi
-
-# Optional: Save CSV (default true, so add --no-csv if false)
-if [ "$4" = "false" ]; then
-    CMD_ARGS="$CMD_ARGS --no-csv"
-fi
-
-# Optional: Create plots (default true, so add --no-plots if false)  
-if [ "$5" = "false" ]; then
-    CMD_ARGS="$CMD_ARGS --no-plots"
-fi
-
-echo "Running with arguments: $CMD_ARGS"
+# Debug: Show what parameters we received
+echo "Debug - Received parameters:"
+echo "  \$1 (soma_location): '$1'"
+echo "  \$2 (hive_filter): '$2'"
+echo "  \$3 (plot_format): '$3'"
+echo "  \$4 (save_csv): '$4'"
+echo "  \$5 (create_plots): '$5'"
 echo ""
 
-# Check if we're in Code Ocean (has /results directory)
+# Check if we're running in Code Ocean (has /results directory)
 if [ -d "/results" ]; then
-    echo "Code Ocean environment detected - outputs will go to /results"
-    export OUTPUT_DIR="/results"
+    echo "Running in Code Ocean environment"
+    echo "Output will be saved to /results"
 else
-    echo "Local environment - outputs will go to outputs/"
+    echo "Not in Code Ocean - creating outputs directory"
     mkdir -p outputs
-    export OUTPUT_DIR="outputs"
 fi
 
-# Run the analysis
-python /code/app_analysis.py $CMD_ARGS 
+# Run the analysis with App Builder parameters
+echo ""
+echo "Starting analysis with parameters from App Builder..."
+
+# Build the command - handle case where $1 might be empty or contain flags
+if [ -z "$1" ] || [[ "$1" == --* ]]; then
+    echo "Error: No valid soma location provided. Using default 'LC'"
+    SOMA_LOC="LC"
+else
+    SOMA_LOC="$1"
+fi
+
+CMD="python3 /code/app_analysis.py --soma-location $SOMA_LOC"
+
+# Add hive filter if true
+if [ "$2" = "true" ]; then
+    CMD="$CMD --hive-filter"
+fi
+
+# Add plot format if provided
+if [ -n "$3" ] && [ "$3" != "false" ] && [ "$3" != "true" ]; then
+    CMD="$CMD --plot-format $3"
+fi
+
+# Add no-csv if save_csv is false
+if [ "$4" = "false" ]; then
+    CMD="$CMD --no-csv"
+fi
+
+# Add no-plots if create_plots is false
+if [ "$5" = "false" ]; then
+    CMD="$CMD --no-plots"
+fi
+
+echo "Running: $CMD"
+eval $CMD 
