@@ -10,7 +10,8 @@ import pandas as pd
 import numpy as np
 import re
 from typing import Dict, List, Any, Optional, Tuple
-import plotly.graph_objects as go
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 from datetime import datetime
 import os
 
@@ -290,7 +291,7 @@ class SomaAnalyzer:
     
     def _create_stacked_bar_plot(self, summary_df: pd.DataFrame, location_display: str, 
                                 plot_format: str, hive_filter: bool = False) -> str:
-        """Create stacked bar plot showing status distribution per sample"""
+        """Create stacked bar plot using matplotlib"""
         try:
             # Prepare data for stacked bar plot
             plot_data = summary_df[['Sample_ID'] + self.STATUS_COLUMNS].set_index('Sample_ID')
@@ -300,32 +301,45 @@ class SomaAnalyzer:
                 self.logger.warning(f"Too many samples ({len(plot_data)}), showing first {Config.MAX_SAMPLES_TO_DISPLAY}")
                 plot_data = plot_data.head(Config.MAX_SAMPLES_TO_DISPLAY)
             
-            # Create the plot
-            fig = go.Figure()
+            # Create the matplotlib figure
+            fig, ax = plt.subplots(figsize=(max(12, len(plot_data) * 0.8), 8))
             
-            for status in self.STATUS_COLUMNS:
-                fig.add_trace(go.Bar(
-                    name=status.replace('_', ' '),
-                    x=plot_data.index,
-                    y=plot_data[status],
-                    marker_color=PLOT_COLORS.get(status, '#B0B0B0')
-                ))
+            # Colors for each status (convert plotly colors to matplotlib format)
+            colors = [PLOT_COLORS.get(status, '#B0B0B0') for status in self.STATUS_COLUMNS]
             
+            # Create stacked bar chart
+            bottom = np.zeros(len(plot_data))
+            bars = []
+            
+            for i, status in enumerate(self.STATUS_COLUMNS):
+                if status in plot_data.columns:
+                    bars.append(ax.bar(
+                        plot_data.index, 
+                        plot_data[status], 
+                        bottom=bottom,
+                        color=colors[i],
+                        label=status.replace('_', ' '),
+                        edgecolor='white',
+                        linewidth=0.5
+                    ))
+                    bottom += plot_data[status]
+            
+            # Customize the plot
             hive_suffix = " (HIVE only)" if hive_filter else ""
-            fig.update_layout(
-                title=f'Neuron Reconstruction Status by Sample - {location_display}{hive_suffix}',
-                xaxis_title='Sample ID',
-                yaxis_title='Number of Neurons',
-                barmode='stack',
-                height=600,
-                width=max(800, len(plot_data) * 60),
-                showlegend=True,
-                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
-            )
+            ax.set_title(f'Neuron Reconstruction Status by Sample - {location_display}{hive_suffix}', 
+                        fontsize=14, fontweight='bold', pad=20)
+            ax.set_xlabel('Sample ID', fontsize=12)
+            ax.set_ylabel('Number of Neurons', fontsize=12)
             
             # Rotate x-axis labels if many samples
             if len(plot_data) > 10:
-                fig.update_xaxes(tickangle=45)
+                plt.xticks(rotation=45, ha='right')
+            
+            # Add legend
+            ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+            
+            # Adjust layout to prevent label cutoff
+            plt.tight_layout()
             
             # Save plot
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -334,14 +348,15 @@ class SomaAnalyzer:
             plot_filename = f"soma_analysis_plot_{file_location}{hive_file_suffix}_{timestamp}.{plot_format}"
             plot_path = os.path.join(Config.OUTPUT_DIR, plot_filename)
             
-            if plot_format.lower() == 'html':
-                fig.write_html(plot_path)
-            elif plot_format.lower() in ['svg', 'png', 'pdf', 'jpeg']:
-                width = 1200 if len(plot_data) <= 10 else max(1200, len(plot_data) * 80)
-                height = 600
-                fig.write_image(plot_path, format=plot_format, width=width, height=height, scale=2)
+            # Save in requested format
+            if plot_format.lower() in ['png', 'svg', 'pdf']:
+                plt.savefig(plot_path, format=plot_format, dpi=300, bbox_inches='tight')
             else:
-                raise ValueError(f"Unsupported plot format: {plot_format}")
+                # Default to PNG if unsupported format
+                plot_path = plot_path.replace(f".{plot_format}", ".png")
+                plt.savefig(plot_path, format='png', dpi=300, bbox_inches='tight')
+            
+            plt.close()  # Close the figure to free memory
             
             self.logger.info(f"Plot saved: {plot_path}")
             return plot_path
