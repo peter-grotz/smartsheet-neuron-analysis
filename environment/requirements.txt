@@ -1,0 +1,8 @@
+smartsheet-python-sdk==3.0.3
+pandas==2.1.4
+matplotlib==3.8.2
+plotly==5.17.0
+python-dotenv==1.0.0
+requests==2.31.0
+numpy==1.24.3
+kaleido==0.2.1 

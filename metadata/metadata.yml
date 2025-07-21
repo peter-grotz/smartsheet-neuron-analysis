@@ -1,0 +1,40 @@
+name: "Smartsheet Neuron Reconstruction Analysis"
+description: "Analyze neuron reconstruction data by soma location with optional HIVE filtering from Smartsheet data"
+version: "1.0.0"
+language: "python"
+
+# Authors information
+authors:
+  - name: "Your Name"
+    affiliations:
+      - name: "Your Institution"
+
+# App Builder configuration
+app_panel:
+  title: "Neuron Reconstruction Analysis"
+  description: "Enter parameters to analyze neuron reconstruction data from Smartsheet"
+
+# Default command - Code Ocean will run this
+command: "python run_analysis.py"
+
+# Environment variables required
+environment_variables:
+  - name: "SMARTSHEET_ACCESS_TOKEN"
+    description: "Smartsheet API access token"
+    required: true
+    sensitive: true
+
+# Output patterns for Code Ocean to recognize
+outputs:
+  - pattern: "/results/*.csv"
+    description: "Analysis results in CSV format"
+    type: "data"
+  - pattern: "/results/*.svg"
+    description: "Visualization plots (SVG format)"
+    type: "figure"
+  - pattern: "/results/*.png"
+    description: "Visualization plots (PNG format)"
+    type: "figure"
+  - pattern: "/results/*.html"
+    description: "Interactive visualization plots"
+    type: "figure" 

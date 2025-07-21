@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Code Ocean entry point script
+# This script runs the Smartsheet neuron reconstruction analysis
+
+echo "Code Ocean - Smartsheet Neuron Reconstruction Analysis"
+echo "========================================================"
+
+# Check if we're running in Code Ocean (has /results directory)
+if [ -d "/results" ]; then
+    echo "Running in Code Ocean environment"
+    echo "Output will be saved to /results"
+else
+    echo "Not in Code Ocean - creating outputs directory"
+    mkdir -p outputs
+fi
+
+# Run the main analysis script
+echo ""
+echo "Starting analysis..."
+python3 run_analysis.py 

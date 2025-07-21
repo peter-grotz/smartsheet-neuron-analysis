@@ -1,0 +1,14 @@
+# Smartsheet API Configuration
+# Copy this file to .env and fill in your actual values
+
+# Required: Your Smartsheet API Access Token
+# Get this from: Account > Apps & Integrations > API Access
+SMARTSHEET_ACCESS_TOKEN=CRq7uSV953IvF7PlDqYR3sDPrMXmwxr0MhRVh
+
+# Optional: Default sheet ID to load
+# You can find this in the sheet URL or by using the list_sheets() method
+DEFAULT_SHEET_ID=3824679856852868
+
+# Optional: Directory for saving generated charts
+# Default: outputs
+OUTPUT_DIR=outputs 
