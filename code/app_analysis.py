@@ -108,7 +108,7 @@ def main():
     
     try:
         # Initialize visualizer
-        print("🔄 Initializing Smartsheet connection...")
+        print("Initializing Smartsheet connection...")
         viz = SmartsheetVisualizer()
         
         # Load the default sheet
@@ -138,7 +138,7 @@ def main():
         create_plots = args.create_plots and not args.no_plots
         
         # Run analysis
-        print(f"\n🔬 Running analysis for '{args.soma_location}'...")
+        print(f"\nRunning analysis for '{args.soma_location}'...")
         summary_df = viz.analyze_soma_location(
             soma_location=args.soma_location,
             save_csv=save_csv,
@@ -148,8 +148,8 @@ def main():
         )
         
         if not summary_df.empty:
-                    print(f"\nAnalysis completed successfully!")
-        print(f"   Found data for {len(summary_df)} samples")
+            print(f"\nAnalysis completed successfully!")
+            print(f"   Found data for {len(summary_df)} samples")
             print(f"   Total neurons analyzed: {summary_df['Total_Neurons'].sum()}")
             print(f"\nOutput files saved to 'outputs' directory")
         else:
